@@ -133,8 +133,8 @@ app.post('/api/vision', apiLimiter, handleVision);
 // Serve Static Frontend (Production)
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// Catch-all to serve React app for any unmatched routes
-app.get('*', (req, res) => {
+// Catch-all to serve React app for any unmatched routes (Bulletproof Middleware for Express 5)
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
