@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
@@ -128,6 +129,14 @@ app.use(express.json({ limit: '5mb' }));
 // Gemini endpoints secured with rate limit
 app.post('/api/chat', apiLimiter, (req, res) => handleChat(req, res, stadiumZones));
 app.post('/api/vision', apiLimiter, handleVision);
+
+// Serve Static Frontend (Production)
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// Catch-all to serve React app for any unmatched routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {

@@ -45,7 +45,7 @@ function App() {
   ];
 
   const triggerPostGame = () => {
-    const socket = io('http://localhost:3001', { 
+    const socket = io('/', { 
       reconnectionAttempts: 3, 
       timeout: 5000 
     });
