@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VenueFlow AI Pro | Secure Scan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-container": "#4da8fe",
+                      "outline-variant": "#48474f",
+                      "secondary-container": "#ad009b",
+                      "on-tertiary": "#003258",
+                      "on-primary": "#005f64",
+                      "surface-container-high": "#1f1f27",
+                      "tertiary-dim": "#47a2f8",
+                      "primary-fixed": "#00f1fe",
+                      "surface-container-lowest": "#000000",
+                      "on-secondary": "#42003a",
+                      "on-tertiary-container": "#002746",
+                      "on-secondary-fixed-variant": "#950085",
+                      "secondary-dim": "#ff59e3",
+                      "on-primary-container": "#00555a",
+                      "secondary-fixed": "#ffbeeb",
+                      "surface-container-highest": "#25252e",
+                      "primary-container": "#00f1fe",
+                      "surface-container": "#191921",
+                      "inverse-primary": "#006a70",
+                      "background": "#0e0e14",
+                      "on-error-container": "#ffa8a3",
+                      "on-error": "#490006",
+                      "secondary": "#ff59e3",
+                      "surface-dim": "#0e0e14",
+                      "secondary-fixed-dim": "#ffa8e7",
+                      "surface-bright": "#2b2b35",
+                      "on-primary-fixed-variant": "#006065",
+                      "on-primary-fixed": "#004145",
+                      "inverse-on-surface": "#55545c",
+                      "primary": "#99f7ff",
+                      "error": "#ff716c",
+                      "outline": "#76747d",
+                      "on-tertiary-fixed-variant": "#003b66",
+                      "surface-tint": "#99f7ff",
+                      "on-secondary-fixed": "#640059",
+                      "primary-fixed-dim": "#00e2ee",
+                      "tertiary-fixed-dim": "#4da8fe",
+                      "surface": "#0e0e14",
+                      "on-tertiary-fixed": "#001930",
+                      "tertiary": "#6fb5ff",
+                      "on-background": "#f6f2fc",
+                      "tertiary-fixed": "#6fb5ff",
+                      "on-secondary-container": "#fff5f8",
+                      "on-surface-variant": "#acaab3",
+                      "surface-container-low": "#13131a",
+                      "error-container": "#9f0519",
+                      "surface-variant": "#25252e",
+                      "primary-dim": "#00e2ee",
+                      "on-surface": "#f6f2fc",
+                      "inverse-surface": "#fcf8ff",
+                      "error-dim": "#d7383b"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Space Grotesk"],
+                      "body": ["Manrope"],
+                      "label": ["Space Grotesk"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .data-grid-overlay {
+            background-image: radial-gradient(circle, #48474f 1px, transparent 1px);
+            background-size: 32px 32px;
+            opacity: 0.1;
+        }
+        .scan-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #99f7ff, transparent);
+            box-shadow: 0 0 15px #00f1fe;
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(37, 37, 46, 0.4);
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .animate-scan {
+            animation: scan 3s linear infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container min-h-screen overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#0e0e14]/80 backdrop-blur-xl bg-gradient-to-b from-[#13131a] to-transparent shadow-[0px_24px_48px_-12px_rgba(153,247,255,0.08)]">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/15 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="close up professional headshot of a person with cybernetic glowing accents in a high-tech laboratory setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLgdHMHK-eoI5KpMt4o1qT1izZ4wgB0EOX2Wa4K5hb9O_Th7BN8bMUT1PBJoIjXxVgr7kDH3JJCOfV6f9ZXwQTnyk-saHBiv7eX79T4RHW1XBEKFzZtbaAEXuyJc7uq_7VRSE6L1rIv7wJt9JwuoaRreNiKQMYgVi58bGbuOYxvmvntNsBfXPAXKlIo9xG2L_dF6t0jPEaeDPrTUBCP1iHQq7h1z7SlinwT-uWD5DPN2IBv_Bfj8V7HQkL0efjGw1s6GrXGycSDH2Z"/>
+</div>
+<h1 class="text-xl font-bold tracking-tighter text-[#00F2FF] font-headline">VenueFlow AI Pro</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#f6f2fc]/60 hover:text-[#00F2FF] transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-7xl mx-auto relative min-h-screen">
+<!-- Background Decor -->
+<div class="fixed inset-0 data-grid-overlay pointer-events-none"></div>
+<div class="fixed -top-24 -right-24 w-96 h-96 bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
+<div class="fixed top-1/2 -left-24 w-80 h-80 bg-secondary/5 blur-[100px] rounded-full pointer-events-none"></div>
+<!-- Section Header -->
+<div class="mb-12 relative">
+<span class="font-headline text-xs tracking-[0.3em] text-primary uppercase font-bold mb-2 block">AI Authentication Neural Link</span>
+<h2 class="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface drop-shadow-[0_0_20px_rgba(153,247,255,0.3)]">
+                SECURE UPLOAD
+            </h2>
+<div class="h-[1px] w-24 bg-gradient-to-r from-primary to-transparent mt-4"></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Side: Scanner Zone -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Large Glassmorphic Upload Zone -->
+<div class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+<div class="relative glass-panel rounded-xl border border-outline-variant/15 p-1 aspect-video md:aspect-[21/9] flex items-center justify-center overflow-hidden">
+<!-- Internal Decorative Grid -->
+<div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(#48474f 1px, transparent 1px), linear-gradient(90deg, #48474f 1px, transparent 1px); background-size: 40px 40px;"></div>
+<!-- Animated Scan Line -->
+<div class="absolute w-full scan-line animate-scan z-10"></div>
+<!-- HUD Corner Accents -->
+<div class="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-primary/40"></div>
+<div class="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-primary/40"></div>
+<div class="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-primary/40"></div>
+<div class="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-primary/40"></div>
+<!-- Center Interaction -->
+<div class="text-center space-y-6 relative z-20">
+<div class="w-20 h-20 mx-auto rounded-full bg-surface-container-high border border-primary/30 flex items-center justify-center shadow-[0_0_40px_rgba(153,247,255,0.1)] transition-transform duration-500 group-hover:scale-110">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="document_scanner">document_scanner</span>
+</div>
+<div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-2">Capture or Drop</h3>
+<p class="text-on-surface-variant font-body max-w-xs mx-auto text-sm leading-relaxed">
+                                    Neural engine ready for PDF, PNG, or JPEG validation.
+                                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="flex-1 group relative flex items-center justify-center gap-3 py-5 px-8 bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-headline font-bold rounded-lg shadow-[0_0_25px_rgba(255,89,227,0.4)] transition-all active:scale-95 hover:brightness-110">
+<span class="material-symbols-outlined" data-icon="photo_camera">photo_camera</span>
+                        ACTIVATE CAMERA
+                        <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</button>
+<button class="flex-1 flex items-center justify-center gap-3 py-5 px-8 bg-surface-container-high border border-outline-variant/30 text-on-surface font-headline font-bold rounded-lg hover:bg-surface-container-highest transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary" data-icon="file_upload">file_upload</span>
+                        BROWSE FILES
+                    </button>
+</div>
+</div>
+<!-- Right Side: Metadata / Info Bento -->
+<div class="lg:col-span-4 grid grid-cols-1 gap-6">
+<!-- System Status Card -->
+<div class="bg-surface-container-low p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute left-0 top-0 w-1 h-full bg-secondary scale-y-0 group-hover:scale-y-100 transition-transform duration-300"></div>
+<div class="flex items-center justify-between mb-6">
+<span class="font-headline text-[10px] tracking-widest text-on-surface-variant uppercase">System Integrity</span>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<span class="text-[10px] font-headline text-primary">LIVE</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/10 pb-3">
+<span class="text-on-surface-variant">Encryption</span>
+<span class="text-on-surface font-mono font-bold">AES-256-GCM</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/10 pb-3">
+<span class="text-on-surface-variant">Model</span>
+<span class="text-on-surface font-mono font-bold">VF-Neural v4.2</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/10 pb-3">
+<span class="text-on-surface-variant">Latency</span>
+<span class="text-on-surface font-mono font-bold">12ms</span>
+</div>
+</div>
+</div>
+<!-- Recent Activity Card -->
+<div class="bg-surface-container-low p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute left-0 top-0 w-1 h-full bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-300"></div>
+<h4 class="font-headline text-sm font-bold text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="history">history</span>
+                        RECENT SCAN LOGS
+                    </h4>
+<div class="space-y-6">
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="confirmation_number">confirmation_number</span>
+</div>
+<div>
+<p class="text-xs font-bold text-on-surface uppercase tracking-wider mb-1">Ultra Music Fest</p>
+<p class="text-[10px] text-on-surface-variant">Verified 14m ago • Section A2</p>
+</div>
+</div>
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary" data-icon="warning">warning</span>
+</div>
+<div>
+<p class="text-xs font-bold text-on-surface uppercase tracking-wider mb-1">Unknown Format</p>
+<p class="text-[10px] text-on-surface-variant">Rejected 1h ago • Error Code 40</p>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Insight Card -->
+<div class="relative overflow-hidden rounded-xl h-48 group">
+<img alt="Cyber Background" class="absolute inset-0 w-full h-full object-cover grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-50 transition-all duration-700" data-alt="abstract digital artwork showing complex neural network connections with glowing nodes and data streams in cyan and magenta" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB91GGd5716Cv8hdIPzVKxUlZHIvQHTQ_XVpOOlRzKqsOYY9xgl0T4OEfEosgokFV-oBIRP2NsgDJA-7MgM7m58Y_Nua9mmITgOe8QK4_dmTIAAW-cazVD3skL3LqWSA0m7FCPL9q2eZICYkxfdRu8WNPfeARr_3qNMo3Mg1XUBcpg2LQv8NrQVDD7gjPh8NfSA_p4MUhzDwRqT4FAkcyGNIsI1bwEc_5iEo1odk1TSuCx36znwPjo7sQ3sOSqHIr5t6PzRqMf8SCeB"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="font-headline text-[10px] text-primary tracking-widest font-bold mb-1 uppercase">AI Pulse</p>
+<p class="text-xs text-on-surface leading-tight font-medium">Auto-detection active. Scan clarity optimized for low-light conditions.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-[#0e0e14]/90 backdrop-blur-2xl z-50 border-t border-[#48474f]/15 shadow-[0_-10px_30px_rgba(0,242,255,0.05)] rounded-t-2xl md:hidden">
+<a class="flex flex-col items-center justify-center text-[#00F2FF] relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-[#ff59e3] after:rounded-full group active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="document_scanner" style="font-variation-settings: 'FILL' 1;">document_scanner</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#f6f2fc]/40 hover:text-[#99f7ff] transition-all group active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="confirmation_number">confirmation_number</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest">Tickets</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#f6f2fc]/40 hover:text-[#99f7ff] transition-all group active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="history">history</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#f6f2fc]/40 hover:text-[#99f7ff] transition-all group active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest">Account</span>
+</a>
+</nav>
+<!-- Desktop Navigation (Integrated in TopAppBar) -->
+<div class="hidden md:flex fixed top-0 right-24 h-16 items-center gap-8 z-[60]">
+<a class="font-headline text-[11px] font-bold tracking-[0.2em] text-[#00F2FF] uppercase" href="#">Scan</a>
+<a class="font-headline text-[11px] font-bold tracking-[0.2em] text-on-surface/40 hover:text-primary transition-colors uppercase" href="#">Tickets</a>
+<a class="font-headline text-[11px] font-bold tracking-[0.2em] text-on-surface/40 hover:text-primary transition-colors uppercase" href="#">History</a>
+<a class="font-headline text-[11px] font-bold tracking-[0.2em] text-on-surface/40 hover:text-primary transition-colors uppercase" href="#">Account</a>
+</div>
+</body></html>

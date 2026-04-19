@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  /* Stitch Design System: The Neural Interface (Cyber Obsidian) */
+  --bg-dark: #0e0e14; /* The Void (surface-lowest) */
+  --bg-card: #13131a; /* The Plinth (surface-container-low) */
+  --bg-focus: #1f1f27; /* The Focus (surface-container-high) */
+  
+  --primary: #99f7ff; 
+  --primary-container: #00f1fe;
+  --primary-dim: #00e2ee;
+  
+  --secondary: #ff59e3; 
+  --secondary-container: #ad009b;
+  
+  --text-main: #f6f2fc;
+  --text-muted: #acaab3;
+  --ghost-border: rgba(72, 71, 79, 0.15); /* outline-variant at 15% */
+  
+  /* Heatmap Overrides */
+  --density-low: #10b981; 
+  --density-med: #f59e0b; 
+  --density-high: #ff716c; /* Using system error red */
+
+  --hype-low: #3b82f6; 
+  --hype-med: #ad009b; /* secondary container */
+  --hype-high: #00f1fe; /* primary container for max hype */
+
+  /* Neural Interface Glass Rules */
+  --glass-shadow: 0px 24px 48px -12px rgba(153, 247, 255, 0.08); /* Ambient Glow Shadow */
+  --glass-overlay-bg: rgba(37, 37, 46, 0.6); /* surface-variant transparent */
+  --blur-amount: 20px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(19, 19, 26, 0.7);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid rgba(153, 247, 255, 0.05);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel:hover {
+  background: rgba(31, 31, 39, 0.8);
+  border-color: rgba(153, 247, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+p {
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* Neural HUD Animations */
+@keyframes scanningLine {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.hud-scan {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  pointer-events: none;
+  z-index: 1000;
+  animation: scanningLine 8s linear infinite;
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 10px rgba(153, 247, 255, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(153, 247, 255, 0.4); }
+  100% { box-shadow: 0 0 10px rgba(153, 247, 255, 0.2); }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+body {
+  min-height: max(884px, 100dvh);
+  overflow-x: hidden;
+  background-color: var(--bg-dark);
+}

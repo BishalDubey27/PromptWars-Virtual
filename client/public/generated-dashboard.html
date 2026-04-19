@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VenueFlow AI Pro | AR Stadium Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#ad009b",
+                    "surface-dim": "#0e0e14",
+                    "surface-variant": "#25252e",
+                    "on-tertiary-fixed-variant": "#003b66",
+                    "primary-container": "#00f1fe",
+                    "secondary-dim": "#ff59e3",
+                    "tertiary": "#6fb5ff",
+                    "on-surface-variant": "#acaab3",
+                    "on-primary-fixed": "#004145",
+                    "on-tertiary-container": "#002746",
+                    "primary-fixed-dim": "#00e2ee",
+                    "error": "#ff716c",
+                    "surface-container-lowest": "#000000",
+                    "on-primary-fixed-variant": "#006065",
+                    "surface": "#0e0e14",
+                    "outline-variant": "#48474f",
+                    "surface-container": "#191921",
+                    "primary-fixed": "#00f1fe",
+                    "background": "#0e0e14",
+                    "on-secondary-fixed": "#640059",
+                    "secondary-fixed-dim": "#ffa8e7",
+                    "on-secondary": "#42003a",
+                    "secondary": "#ff59e3",
+                    "primary": "#99f7ff",
+                    "on-secondary-fixed-variant": "#950085",
+                    "on-secondary-container": "#fff5f8",
+                    "on-error-container": "#ffa8a3",
+                    "surface-container-low": "#13131a",
+                    "tertiary-dim": "#47a2f8",
+                    "on-tertiary-fixed": "#001930",
+                    "surface-tint": "#99f7ff",
+                    "primary-dim": "#00e2ee",
+                    "surface-container-highest": "#25252e",
+                    "inverse-surface": "#fcf8ff",
+                    "on-primary": "#005f64",
+                    "error-container": "#9f0519",
+                    "on-surface": "#f6f2fc",
+                    "inverse-primary": "#006a70",
+                    "outline": "#76747d",
+                    "on-tertiary": "#003258",
+                    "tertiary-container": "#4da8fe",
+                    "error-dim": "#d7383b",
+                    "inverse-on-surface": "#55545c",
+                    "tertiary-fixed": "#6fb5ff",
+                    "secondary-fixed": "#ffbeeb",
+                    "on-error": "#490006",
+                    "tertiary-fixed-dim": "#4da8fe",
+                    "surface-container-high": "#1f1f27",
+                    "surface-bright": "#2b2b35",
+                    "on-primary-container": "#00555a",
+                    "on-background": "#f6f2fc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Manrope"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #0e0e14; color: #f6f2fc; overflow-x: hidden; }
+        .headline { font-family: 'Space Grotesk', sans-serif; }
+        .glass-panel {
+            background: rgba(37, 37, 46, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .hud-border-cyan { border-left: 2px solid #99f7ff; }
+        .hud-border-magenta { border-left: 2px solid #ff59e3; }
+        .neon-glow-cyan { filter: drop-shadow(0 0 8px rgba(153, 247, 255, 0.4)); }
+        .neon-glow-magenta { filter: drop-shadow(0 0 10px rgba(255, 89, 227, 0.6)); }
+        .scanning-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #99f7ff, transparent);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .pulse-ring {
+            position: relative;
+            width: 12px;
+            height: 12px;
+            background: #99f7ff;
+            border-radius: 50%;
+        }
+        .pulse-ring::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: 2px solid #99f7ff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#0e0e14] to-transparent">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#00f2ff] text-2xl scale-95 active:scale-90 transition-transform">blur_on</span>
+<span class="font-['Space_Grotesk'] font-black italic tracking-tighter text-[#00f2ff] text-xl">VENUEFLOW AI</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-['Space_Grotesk'] font-bold tracking-widest text-sm text-[#00f2ff] hover:text-[#00f2ff] transition-colors" href="#">DASHBOARD</a>
+<a class="font-['Space_Grotesk'] font-bold tracking-widest text-sm text-[#f6f2fc]/60 hover:text-[#00f2ff] transition-colors" href="#">ANALYTICS</a>
+<a class="font-['Space_Grotesk'] font-bold tracking-widest text-sm text-[#f6f2fc]/60 hover:text-[#00f2ff] transition-colors" href="#">CONCIERGE</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded-full border border-primary-container/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a digital avatar with blue neon rim lighting and a high-tech robotic aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdQWhWZXYuppBS5wTzXZ7ZT6r0sxSbGFxkkw66Ozmuin2ay3pvCQILU19N39HbpmLgBp_K7LOXR70phH0Rp7g_VB_ZSM4p8Tp8pa0PaRVTjPIbNQUv81i35G_DFA3_QDuNSJjQxLAonT_sr5WddyUgCYd2YrAzylE57bTF6RqBa4qe112xzq85z5SEide5Q6uhQVnc6rlWdgnuBJWzYz4s5mXRuBERxOW6ZjTafXCKpjQ-7Ep-Kby_FxCEs0SoKfL_NMUogySqfbX8"/>
+</div>
+</div>
+</div>
+</header>
+<main class="min-h-screen pt-24 pb-32 px-4 md:px-8 max-w-[1600px] mx-auto grid grid-cols-12 gap-6">
+<!-- Left Column: HUD Widgets -->
+<aside class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+<!-- Live Queue Times -->
+<section class="glass-panel p-6 rounded-xl hud-border-cyan">
+<div class="flex justify-between items-center mb-6">
+<h2 class="headline text-xs font-bold tracking-[0.2em] text-primary uppercase">Live Queue Monitor</h2>
+<div class="pulse-ring"></div>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between group hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-dim">wc</span>
+<span class="font-medium text-sm">North Restroom</span>
+</div>
+<span class="headline font-bold text-primary">5m</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between group hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-dim">fastfood</span>
+<span class="font-medium text-sm">Neon Grill B4</span>
+</div>
+<span class="headline font-bold text-primary">12m</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between group hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-dim">local_bar</span>
+<span class="font-medium text-sm">Skyline Lounge</span>
+</div>
+<span class="headline font-bold text-secondary">CLOSED</span>
+</div>
+</div>
+</section>
+<!-- Dynamic Seat Upgrade Notification -->
+<section class="relative overflow-hidden p-6 rounded-xl bg-gradient-to-br from-secondary-container/20 to-surface-container hud-border-magenta shadow-[0_0_30px_rgba(255,89,227,0.1)]">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary animate-pulse">stars</span>
+<h2 class="headline text-xs font-bold tracking-[0.2em] text-secondary uppercase">Priority Upgrade</h2>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+                        VIP Suite 402 has just become available. Tap to upgrade your current seat for the second half.
+                    </p>
+<button class="w-full py-3 bg-gradient-to-r from-secondary to-secondary-dim text-on-secondary font-bold text-xs tracking-widest rounded uppercase hover:opacity-90 transition-all neon-glow-magenta">
+                        Claim Seat Now
+                    </button>
+</div>
+<div class="scanning-line opacity-20"></div>
+</section>
+</aside>
+<!-- Center Column: Stadium Heatmap -->
+<div class="col-span-12 lg:col-span-6 flex flex-col gap-6">
+<section class="glass-panel flex-1 rounded-2xl relative overflow-hidden group">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-40 mix-blend-luminosity" data-alt="aerial top-down view of a futuristic sports stadium at night with glowing blue and magenta stadium seating and geometric neon light patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEq1tcJyYcfKlW4qzK7u8XKJRZIyUZQ5tnGRzwG_JV1JS2TQoFk95VNWMNk04CXio1xYmZCmdhcPD23DLcdudfq_Kn6hbtpwwgWJIFPqY1RareNFaTRtcbkzmvqJIN6L92RdSNElmmgul68G1_H9jM6jde44IQikStfDQyLFPJCMXA8CIAk9ZdwSXP5Pnd-3JcNnS2J76dexT85pfMxm5H5WNW4q1_3kLc3jjfhi1Cs_UJ8DYBwL6Dlx7H1KptMYgIV7neuhC8PO8k"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+</div>
+<!-- Overlay UI Elements for Heatmap -->
+<div class="relative z-10 h-full p-8 flex flex-col">
+<div class="flex justify-between items-start mb-auto">
+<div>
+<h1 class="headline text-4xl font-black tracking-tighter text-on-surface mb-2">ZONE B-12</h1>
+<div class="flex items-center gap-2 text-primary-dim">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="text-xs font-bold tracking-widest uppercase">Live Crowd Density: 84%</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<div class="px-3 py-1 bg-primary/10 border border-primary/20 rounded text-[10px] font-bold text-primary tracking-widest uppercase">AR Active</div>
+<div class="text-right">
+<div class="text-xs text-on-surface-variant">Gate Arrival</div>
+<div class="headline font-bold text-xl text-on-surface">+14m</div>
+</div>
+</div>
+</div>
+<!-- HUD Data Points -->
+<div class="grid grid-cols-2 gap-4 mt-8">
+<div class="p-4 bg-surface-container-lowest/60 backdrop-blur-md rounded-lg border border-outline-variant/20">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Fan Engagement</div>
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4 shadow-[0_0_8px_#99f7ff]"></div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest/60 backdrop-blur-md rounded-lg border border-outline-variant/20">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Noise Levels</div>
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/2 shadow-[0_0_8px_#ff59e3]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Scanning Effect Over Heatmap -->
+<div class="scanning-line"></div>
+</section>
+</div>
+<!-- Right Column: AI Concierge -->
+<aside class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+<section class="glass-panel flex-1 rounded-xl flex flex-col overflow-hidden hud-border-cyan">
+<div class="p-6 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div>
+<h2 class="headline text-sm font-bold tracking-widest text-on-surface uppercase">AI Concierge</h2>
+<span class="text-[10px] text-primary uppercase font-bold tracking-widest">Always Listening</span>
+</div>
+</div>
+</div>
+<!-- Chat Feed -->
+<div class="flex-1 p-6 overflow-y-auto space-y-4">
+<div class="flex flex-col items-start gap-1">
+<div class="bg-surface-container-high px-4 py-3 rounded-2xl rounded-tl-none text-sm max-w-[85%] text-on-surface-variant">
+                            Hello! I noticed you're near Gate 4. Would you like me to find the quickest route to Section 202?
+                        </div>
+<span class="text-[10px] text-outline ml-2">2:14 PM</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="bg-primary/20 px-4 py-3 rounded-2xl rounded-tr-none text-sm max-w-[85%] text-primary font-medium">
+                            Yes, and order two waters for pickup on the way.
+                        </div>
+<span class="text-[10px] text-outline mr-2">2:15 PM</span>
+</div>
+<div class="flex flex-col items-start gap-1">
+<div class="bg-surface-container-high px-4 py-3 rounded-2xl rounded-tl-none text-sm max-w-[85%] text-on-surface-variant italic">
+                            Order confirmed. Scanning for ticket validation...
+                        </div>
+</div>
+</div>
+<!-- Chat Input / Action -->
+<div class="p-4 bg-surface-container-low border-t border-outline-variant/10">
+<button class="w-full mb-3 flex items-center justify-center gap-2 py-3 bg-surface-container-highest border border-outline-variant/30 rounded-lg hover:bg-surface-bright transition-all group">
+<span class="material-symbols-outlined text-primary-dim text-sm">confirmation_number</span>
+<span class="text-xs font-bold tracking-widest uppercase text-on-surface">Upload Ticket</span>
+</button>
+<div class="relative">
+<input class="w-full bg-transparent border-0 border-b border-outline-variant py-2 pr-10 text-sm focus:ring-0 focus:border-primary placeholder:text-outline transition-colors" placeholder="Ask anything..." type="text"/>
+<button class="absolute right-0 top-1/2 -translate-y-1/2 text-primary">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</section>
+</aside>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center h-16 px-4 bg-[#25252e]/60 backdrop-blur-2xl rounded-2xl mx-auto mb-6 w-[92%] max-w-lg border border-[#48474f]/20 shadow-[0px_24px_48px_-12px_rgba(153,247,255,0.15)] animate-pulse-slow">
+<button class="flex flex-col items-center gap-1 group text-[#00f2ff] drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] scale-110">
+<span class="material-symbols-outlined">dashboard</span>
+</button>
+<button class="flex flex-col items-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff]">
+<span class="material-symbols-outlined">query_stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff]">
+<span class="material-symbols-outlined">smart_toy</span>
+</button>
+<button class="flex flex-col items-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff]">
+<span class="material-symbols-outlined">confirmation_number</span>
+</button>
+<button class="flex flex-col items-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff]">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</nav>
+<!-- Global AR Texture Overlays -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] z-[100] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+<div class="fixed inset-0 pointer-events-none z-[101] bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5"></div>
+</body></html>

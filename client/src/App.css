@@ -1,0 +1,50 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--blur-amount));
+  z-index: 10;
+}
+
+.brand-title {
+  font-size: 1.5rem;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.map-wrapper {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Sidebar for controls */
+.sidebar {
+  width: 350px;
+  padding: 24px;
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--blur-amount));
+  border-left: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 10;
+}
