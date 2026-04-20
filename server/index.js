@@ -20,14 +20,16 @@ require('dotenv').config();
 
 // Google Cloud Logging
 let logging = null;
+/*
 try {
   const { Logging } = require('@google-cloud/logging');
   logging = new Logging();
 } catch (e) {
   console.warn('Google Cloud Logging not initialized (local development)');
 }
+*/
 
-const app = express();
+const gemini = null; // require('./gemini');
 const log = (message, severity = 'INFO') => {
   if (logging) {
     const logEntry = logging.log('venueflow-logs').entry({ message }, message);
