@@ -1,8 +1,5 @@
-const { GoogleGenerativeAI } = require('@google-cloud/logging');
-const { GoogleGenerativeAI: GenAI } = require('@google-cloud/logging');
-// Use the official SDK correctly
-const { GoogleGenerativeAI: GoogleAISDK } = require('@google-ai/generativelanguage'); // Wait, check the import
-const { GoogleGenerativeAI: GoogleGenerativeAI_SDK } = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config();
 
 /**
  * Sanitization Setup for Server-Side
