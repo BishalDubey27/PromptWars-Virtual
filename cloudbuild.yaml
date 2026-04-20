@@ -4,7 +4,7 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/venueflow-ai:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/venueflow-ai:$BUILD_ID'
       - '--build-arg'
       - 'VITE_FIREBASE_API_KEY=${_VITE_FIREBASE_API_KEY}'
       - '.'
@@ -13,7 +13,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/venueflow-ai:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/venueflow-ai:$BUILD_ID'
 
   # Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -23,7 +23,7 @@ steps:
       - 'deploy'
       - 'venueflow-ai'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/venueflow-ai:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/venueflow-ai:$BUILD_ID'
       - '--region'
       - 'us-central1'
       - '--platform'
@@ -45,8 +45,7 @@ steps:
       - 'GEMINI_API_KEY=GEMINI_API_KEY:latest,ALLOWED_ORIGINS=ALLOWED_ORIGINS:latest'
 
 images:
-  - 'gcr.io/$PROJECT_ID/venueflow-ai:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/venueflow-ai:$BUILD_ID'
 
-# Substitution variables — set these in Cloud Build trigger settings
 substitutions:
   _VITE_FIREBASE_API_KEY: ''
