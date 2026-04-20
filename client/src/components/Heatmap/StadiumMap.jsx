@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Wrapper } from "@googlemaps/react-wrapper";
 import { listenToStadiumState } from '../../firebase';
 import { motion } from 'framer-motion';
-import { io } from 'socket.io-client';
+import { useSocket } from '../../contexts/SocketContext';
 import { MapPin, Navigation, Coffee, Shield } from 'lucide-react';
 
 const mapStyles = [
@@ -71,13 +71,18 @@ const StadiumMap = ({ mode, highlightZone }) => {
   const [zones, setZones] = useState({});
   const [showRoute, setShowRoute] = useState(false);
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
+  const socket = useSocket();
 
   useEffect(() => {
     const unsubscribe = listenToStadiumState((data) => { if (data) setZones(data); });
-    const socket = io('/');
-    socket.on('stadium-update', (data) => setZones(data));
-    return () => { unsubscribe(); socket.disconnect(); };
+    return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on('stadium-update', (data) => setZones(data));
+    return () => socket.off('stadium-update');
+  }, [socket]);
 
   const apiKey = ""; // Insert Map Key Here
 

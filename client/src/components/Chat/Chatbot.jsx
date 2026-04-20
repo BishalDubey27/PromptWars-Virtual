@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Camera, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { API_URL } from '../../config/api';
 
 const Chatbot = ({ onClose }) => {
   const [messages, setMessages] = useState([
@@ -27,7 +28,7 @@ const Chatbot = ({ onClose }) => {
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!input.trim()) return;
     
     const userMessage = input.trim();
@@ -35,11 +36,15 @@ const Chatbot = ({ onClose }) => {
     setInput('');
     setIsTyping(true);
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ message: userMessage }),
+        signal: controller.signal,
       });
       
       const data = await response.json();
@@ -57,11 +62,16 @@ const Chatbot = ({ onClose }) => {
          speak(reply);
       }
     } catch (err) {
+      const msg = err.name === 'AbortError'
+        ? "Request timed out. Please try again."
+        : "Error connecting to AI Server. 📡";
       console.error(err);
-      setMessages(prev => [...prev, { sender: 'ai', text: "Error connecting to AI Server. 📡" }]);
+      setMessages(prev => [...prev, { sender: 'ai', text: msg }]);
+    } finally {
+      clearTimeout(timeout);
+      setIsTyping(false);
     }
-    setIsTyping(false);
-  };
+  }, [input, ttsEnabled]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -76,7 +86,7 @@ const Chatbot = ({ onClose }) => {
       const base64data = reader.result.split(',')[1];
       
       try {
-        const response = await fetch('http://localhost:3001/api/vision', {
+        const response = await fetch(`${API_URL}/api/vision`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

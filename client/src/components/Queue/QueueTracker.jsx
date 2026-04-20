@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import { useSocket } from '../../contexts/SocketContext';
 import { Clock, Route } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,25 +10,18 @@ const QueueTracker = () => {
     concessions_east: 0,
     concessions_west: 0
   });
-
   const [escapeRoutes, setEscapeRoutes] = useState(null);
+  const socket = useSocket();
 
   useEffect(() => {
-    const socket = io('http://localhost:3001', {
-      reconnectionAttempts: 5,
-      timeout: 5000
-    });
-
-    socket.on('queue-update', (data) => {
-      setQueues(data);
-    });
-
-    socket.on('escape-router', (data) => {
-      setEscapeRoutes(data);
-    });
-
-    return () => socket.disconnect();
-  }, []);
+    if (!socket) return;
+    socket.on('queue-update', (data) => setQueues(data));
+    socket.on('escape-router', (data) => setEscapeRoutes(data));
+    return () => {
+      socket.off('queue-update');
+      socket.off('escape-router');
+    };
+  }, [socket]);
 
   const getUrgencyClass = (time) => {
     if (time < 5) return 'text-primary';

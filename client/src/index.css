@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
   /* Stitch Design System: The Neural Interface (Cyber Obsidian) */
   --bg-dark: #0e0e14; /* The Void (surface-lowest) */
@@ -18,19 +19,6 @@
   --text-muted: #d1d1d1; /* Higher contrast for WCAG AAA */
   --ghost-border: rgba(153, 247, 255, 0.1); 
   
-  /* sr-only for accessibility */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-  
   /* Heatmap Overrides */
   --density-low: #10b981; 
   --density-med: #f59e0b; 
@@ -44,6 +32,19 @@
   --glass-shadow: 0px 24px 48px -12px rgba(153, 247, 255, 0.08); /* Ambient Glow Shadow */
   --glass-overlay-bg: rgba(37, 37, 46, 0.6); /* surface-variant transparent */
   --blur-amount: 20px;
+}
+
+/* sr-only for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 * {

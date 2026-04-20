@@ -32,7 +32,13 @@ const log = (message, severity = 'INFO') => {
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+const io = new Server(server, {
+  cors: { origin: allowedOrigins, methods: ['GET', 'POST'] }
+});
 
 // DEFINTIVE CSP FIX FOR GOOGLE SERVICES
 app.use(helmet({
@@ -52,7 +58,7 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
-app.use(cors());
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: '10mb' }));
 
 let stadiumZones = {
@@ -109,7 +115,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, '0.0.0.0', () => {
   log(`VenueFlow Graduation Build live on port ${PORT}`);
 });

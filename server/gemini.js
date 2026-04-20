@@ -72,19 +72,23 @@ async function handleChat(req, res) {
 }
 
 async function handleVision(req, res) {
-  const { imageBase64, mimeType } = req.body;
+  const { imageBase64, mimeType, prompt } = req.body;
   const modelToUse = vertexModel || standardModel;
 
   if (!modelToUse) return res.status(500).json({ error: "Vision Engine unavailable." });
+  if (!imageBase64) return res.status(400).json({ error: "No image data provided." });
+
+  const visionPrompt = prompt || "Analyze this image and describe what you see.";
 
   try {
     const result = await modelToUse.generateContent([
-      "Analyze this fan view.",
+      dompurify.sanitize(visionPrompt),
       { inlineData: { data: imageBase64, mimeType: mimeType || "image/jpeg" } }
     ]);
     const response = await result.response;
     return res.json({ reply: dompurify.sanitize(response.text()) });
   } catch (err) {
+    console.error("[VISION_ERROR]", err.message);
     return res.status(500).json({ error: "AI Vision failed." });
   }
 }

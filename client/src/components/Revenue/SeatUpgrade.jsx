@@ -1,25 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import { useSocket } from '../../contexts/SocketContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Ticket, X, Check } from 'lucide-react';
 
 const SeatUpgrade = () => {
   const [upgrade, setUpgrade] = useState(null);
+  const socket = useSocket();
 
   useEffect(() => {
-    // Connect to Node backend securely
-    const socket = io('http://localhost:3001', {
-      reconnectionAttempts: 5,
-      timeout: 5000
-    });
-
+    if (!socket) return;
     socket.on('seat-upgrade', (data) => {
-      // Only show one upgrade at a time, ignore new ones if one is active
       setUpgrade(prev => prev ? prev : data);
     });
-
-    return () => socket.disconnect();
-  }, []);
+    return () => socket.off('seat-upgrade');
+  }, [socket]);
 
   if (!upgrade) return null;
 

@@ -5,17 +5,18 @@ import { X, ShieldCheck, Wallet, Ticket, Trophy, Zap, Share2 } from 'lucide-reac
 import { auth, loginWithGoogle } from '../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
-const ProfileModal = ({ isOpen, onClose, tickets = [] }) => {
+const ProfileModal = ({ isOpen, onClose, userName = "GUEST_FAN", tickets = [] }) => {
   const [user, setUser] = React.useState(null);
 
   React.useEffect(() => {
+    if (!auth) return;
     const unsub = onAuthStateChanged(auth, (u) => setUser(u));
     return () => unsub();
   }, []);
 
   if (!isOpen) return null;
 
-  const displayName = user ? user.displayName : "GUEST_FAN";
+  const displayName = user ? user.displayName : userName;
 
   return (
     <AnimatePresence>

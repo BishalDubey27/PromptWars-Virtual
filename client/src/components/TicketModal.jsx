@@ -1,28 +1,37 @@
 import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_URL } from '../config/api';
+
+const VALID_ZONES = ['north', 'south', 'east', 'west'];
 
 const TicketModal = ({ isOpen, onClose, onScanComplete, onScanStart }) => {
   const fileInputRef = useRef(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setIsScanning(true);
+    setErrorMsg('');
     onScanStart();
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
 
     const reader = new FileReader();
     reader.onloadend = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/vision', {
+        const response = await fetch(`${API_URL}/api/vision`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             imageBase64: reader.result.split(',')[1],
             mimeType: file.type,
             prompt: "Extract the section number from this ticket image. Return strictly one of these exact words depending on the section: 'north' (100-110), 'east' (111-120), 'south' (121-130), 'west' (131-140). Reply with ONLY that one word in lowercase, no punctuation or extra text."
-          })
+          }),
+          signal: controller.signal,
         });
         const data = await response.json();
         const reply = data.reply ? data.reply.trim().toLowerCase() : '';
@@ -30,16 +39,18 @@ const TicketModal = ({ isOpen, onClose, onScanComplete, onScanStart }) => {
         setIsScanning(false);
         onClose();
         
-        if (['north', 'south', 'east', 'west'].includes(reply)) {
+        if (VALID_ZONES.includes(reply)) {
           onScanComplete(reply);
         } else {
           onScanComplete(null);
-          alert("Could not identify a valid stadium section on this ticket.");
+          setErrorMsg("Could not identify a valid stadium section on this ticket.");
         }
       } catch (err) {
         setIsScanning(false);
         onScanComplete(null);
-        alert("Ticket scanner failed. Try again.");
+        setErrorMsg(err.name === 'AbortError' ? "Scan timed out. Please try again." : "Ticket scanner failed. Try again.");
+      } finally {
+        clearTimeout(timeout);
       }
     };
     reader.readAsDataURL(file);
@@ -88,6 +99,10 @@ const TicketModal = ({ isOpen, onClose, onScanComplete, onScanStart }) => {
                <p className="text-[12px] text-on-surface-variant text-center max-w-[280px]">
                  Upload a photo of your ticket to automatically route you to your allocated stadium section.
                </p>
+
+               {errorMsg && (
+                 <p className="text-[11px] text-error text-center font-bold">{errorMsg}</p>
+               )}
 
                <input 
                  type="file" 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import StadiumMap from './components/Heatmap/StadiumMap';
 import Chatbot from './components/Chat/Chatbot';
@@ -6,17 +6,19 @@ import LiveAnnouncer from './components/Emergency/LiveAnnouncer';
 import QueueTracker from './components/Queue/QueueTracker';
 import SeatUpgrade from './components/Revenue/SeatUpgrade';
 import TicketModal from './components/TicketModal';
-import { Activity, Users, MessageCircle, Navigation, HelpCircle } from 'lucide-react';
-import { io } from 'socket.io-client';
+import { HelpCircle } from 'lucide-react';
 import * as ReactJoyride from 'react-joyride';
-const Joyride = ReactJoyride.default || ReactJoyride.Joyride;
-const STATUS = ReactJoyride.STATUS;
+const Joyride = ReactJoyride.default ?? ReactJoyride.Joyride;
+const { STATUS } = ReactJoyride;
 import WelcomeModal from './components/WelcomeModal';
 import ProfileModal from './components/ProfileModal';
+import ErrorBoundary from './components/ErrorBoundary';
+import { SocketProvider } from './contexts/SocketContext';
+import { API_URL } from './config/api';
+import { io } from 'socket.io-client';
 
 function App() {
   const [mode, setMode] = useState('density'); // 'density' or 'hype'
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [runTour, setRunTour] = useState(false);
   const [highlightZone, setHighlightZone] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
@@ -45,12 +47,12 @@ function App() {
   ];
 
   const triggerPostGame = () => {
-    const socket = io('/', { 
-      reconnectionAttempts: 3, 
-      timeout: 5000 
+    const socket = io(API_URL, { reconnectionAttempts: 3, timeout: 5000 });
+    socket.on('connect', () => {
+      socket.emit('trigger-game-over');
+      socket.disconnect();
     });
-    socket.emit('trigger-game-over');
-    socket.disconnect();
+    socket.on('connect_error', () => socket.disconnect());
   };
 
   const handleJoyrideCallback = (data) => {
@@ -61,6 +63,7 @@ function App() {
   };
 
   return (
+    <SocketProvider>
     <div className="bg-surface text-on-surface min-h-screen">
       <div className="hud-scan" />
       {showWelcome && (
@@ -119,18 +122,18 @@ function App() {
         
         {/* Left Column: HUD Widgets */}
         <aside className="col-span-12 lg:col-span-3 flex flex-col gap-6 relative z-10 tour-step-3" aria-label="Stadium Services">
-          <QueueTracker />
-          <LiveAnnouncer />
+          <ErrorBoundary><QueueTracker /></ErrorBoundary>
+          <ErrorBoundary><LiveAnnouncer /></ErrorBoundary>
         </aside>
 
         {/* Center Column: Stadium Heatmap */}
         <section className="col-span-12 lg:col-span-6 flex flex-col gap-6 relative z-10 tour-step-2" aria-label="Stadium Heatmap">
-           <StadiumMap mode={mode} highlightZone={highlightZone} />
+           <ErrorBoundary><StadiumMap mode={mode} highlightZone={highlightZone} /></ErrorBoundary>
         </section>
 
         {/* Right Column: AI Concierge */}
         <aside id="chatbot-section" className="col-span-12 lg:col-span-3 flex flex-col gap-6 relative z-10 tour-step-4" aria-label="AI Assistant">
-           <Chatbot />
+           <ErrorBoundary><Chatbot /></ErrorBoundary>
         </aside>
       </main>
 
@@ -195,6 +198,7 @@ function App() {
         tickets={scannedTickets}
       />
     </div>
+    </SocketProvider>
   );
 }
 
