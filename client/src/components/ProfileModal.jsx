@@ -2,8 +2,20 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, Wallet, Ticket, Trophy, Zap, Share2 } from 'lucide-react';
 
-const ProfileModal = ({ isOpen, onClose, userName = "BISHAL_AI_PRO", tickets = [] }) => {
+import { auth, loginWithGoogle } from '../firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+
+const ProfileModal = ({ isOpen, onClose, tickets = [] }) => {
+  const [user, setUser] = React.useState(null);
+
+  React.useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    return () => unsub();
+  }, []);
+
   if (!isOpen) return null;
+
+  const displayName = user ? user.displayName : "GUEST_FAN";
 
   return (
     <AnimatePresence>
@@ -30,7 +42,9 @@ const ProfileModal = ({ isOpen, onClose, userName = "BISHAL_AI_PRO", tickets = [
               </div>
               <div>
                 <h2 className="headline text-[18px] font-black tracking-widest text-on-surface uppercase italic">Neural ID</h2>
-                <span className="text-[10px] text-primary uppercase font-bold tracking-widest animate-pulse">Encrypted Session</span>
+                <span className="text-[10px] text-primary uppercase font-bold tracking-widest animate-pulse">
+                  {user ? 'Verified Session' : 'Encrypted Guest'}
+                </span>
               </div>
             </div>
             <button 
@@ -48,20 +62,21 @@ const ProfileModal = ({ isOpen, onClose, userName = "BISHAL_AI_PRO", tickets = [
               className="relative aspect-[1.6/1] w-full rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(153,247,255,0.15)] group"
             >
                <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a24] to-[#0e0e14] border border-white/10"></div>
-               {/* Animated Grid on Card */}
                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(var(--primary) 0.5px, transparent 0.5px)', backgroundSize: '10px 10px' }}></div>
                
                <div className="relative p-6 h-full flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-4">
                        <div className="w-16 h-16 rounded-lg bg-surface-container-highest border border-primary/20 overflow-hidden relative">
-                          <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${userName}`} alt="avatar" className="w-full h-full object-cover" />
+                          <img src={user?.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${displayName}`} alt="avatar" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
                        </div>
                        <div>
-                          <h3 className="text-xl font-black text-on-surface tracking-tighter uppercase">{userName}</h3>
+                          <h3 className="text-xl font-black text-on-surface tracking-tighter uppercase">{displayName}</h3>
                           <div className="flex items-center gap-2">
-                             <div className="px-2 py-0.5 bg-primary/10 rounded text-[9px] font-black text-primary tracking-widest border border-primary/20">PREMIUM TIER</div>
+                             <div className="px-2 py-0.5 bg-primary/10 rounded text-[9px] font-black text-primary tracking-widest border border-primary/20">
+                               {user ? 'AUTHENTICATED' : 'ANONYMOUS'}
+                             </div>
                           </div>
                        </div>
                     </div>
@@ -138,12 +153,21 @@ const ProfileModal = ({ isOpen, onClose, userName = "BISHAL_AI_PRO", tickets = [
 
           {/* Footer Actions */}
           <div className="p-6 bg-surface-container-low/50 border-t border-outline-variant/10 grid grid-cols-2 gap-4">
-             <button className="py-3 px-4 glass-panel border border-white/5 text-[12px] font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-on-surface-variant">
-                Export ID
-             </button>
-             <button className="py-3 px-4 bg-primary text-black text-[12px] font-black uppercase tracking-widest hover:bg-primary-dim transition-all rounded shadow-[0_0_20px_rgba(153,247,255,0.3)]">
-                Upgrade Pro
-             </button>
+             {user ? (
+               <button 
+                 onClick={() => signOut(auth)}
+                 className="py-3 px-4 glass-panel border border-white/5 text-[12px] font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-on-surface-variant col-span-2">
+                  TERMINATE SESSION
+               </button>
+             ) : (
+               <>
+                 <button 
+                   onClick={() => loginWithGoogle()}
+                   className="py-3 px-4 bg-primary text-black text-[12px] font-black uppercase tracking-widest hover:bg-primary-dim transition-all rounded shadow-[0_0_20px_rgba(153,247,255,0.3)] col-span-2">
+                    LINK NEURAL ID (GOOGLE)
+                 </button>
+               </>
+             )}
           </div>
         </motion.div>
       </div>
