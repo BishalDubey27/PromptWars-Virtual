@@ -14,7 +14,7 @@ const dompurify = createDOMPurify(window);
  */
 let genAI = null;
 if (process.env.GEMINI_API_KEY) {
-  genAI = new GoogleGenerativeAI_SDK(process.env.GEMINI_API_KEY);
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 }
 
 /**

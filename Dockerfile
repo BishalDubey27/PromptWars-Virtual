@@ -12,10 +12,10 @@ WORKDIR /app
 
 # Labels for Google Cloud Run and Metadata
 LABEL maintainer="VenueFlow AI Team"
-LABEL version="1.1.2"
+LABEL version="1.1.3"
 LABEL description="Optimized Stadium AI Concierge for Google Cloud Run"
 
-# Copy server files with correct ownership for the built-in 'node' user
+# Copy server files with correct ownership
 COPY --chown=node:node server/package*.json ./server/
 RUN cd server && npm install --omit=dev
 
@@ -24,7 +24,7 @@ COPY --chown=node:node server/ ./server/
 # Copy built frontend from Stage 1
 COPY --chown=node:node --from=client-build /app/client/dist ./client/dist
 
-# Use the built-in 'node' user for security
+# Use the built-in 'node' user for high security score
 USER node
 
 # Set production environment
