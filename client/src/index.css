@@ -15,8 +15,21 @@
   --secondary-container: #ad009b;
   
   --text-main: #f6f2fc;
-  --text-muted: #acaab3;
-  --ghost-border: rgba(72, 71, 79, 0.15); /* outline-variant at 15% */
+  --text-muted: #d1d1d1; /* Higher contrast for WCAG AAA */
+  --ghost-border: rgba(153, 247, 255, 0.1); 
+  
+  /* sr-only for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
   
   /* Heatmap Overrides */
   --density-low: #10b981; 

@@ -97,72 +97,77 @@ function App() {
       {/* Top Navigation Anchor */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#0e0e14] to-transparent pointer-events-none">
         <div className="flex justify-between items-center w-full px-6 py-4 max-w-[1600px] mx-auto pointer-events-auto">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-[#00f2ff] text-[24px] scale-95">blur_on</span>
+          <div className="flex items-center gap-3" aria-label="VenueFlow AI Logo">
+            <span className="material-symbols-outlined text-[#00f2ff] text-[24px] scale-95" aria-hidden="true">blur_on</span>
             <span className="font-['Space_Grotesk'] font-black italic tracking-tighter text-[#00f2ff] text-[20px]">VENUEFLOW AI</span>
           </div>
-          <div className="hidden md:flex items-center gap-8">
-            <button className="font-['Space_Grotesk'] font-bold tracking-widest text-[14px] text-[#00f2ff] hover:text-[#00f2ff] transition-colors uppercase">DASHBOARD</button>
-            <button className="font-['Space_Grotesk'] font-bold tracking-widest text-[14px] text-[#f6f2fc]/60 hover:text-[#00f2ff] transition-colors uppercase" onClick={triggerPostGame}>POST-GAME ROUTER</button>
-            <button className="font-['Space_Grotesk'] font-bold tracking-widest text-[14px] text-[#f6f2fc]/60 hover:text-[#00f2ff] transition-colors uppercase tour-step-1" onClick={() => setMode(mode === 'density' ? 'hype' : 'density')}>TOGGLE {mode.toUpperCase()}</button>
-          </div>
+          <nav className="hidden md:flex items-center gap-8" aria-label="Main Navigation">
+            <button className="font-['Space_Grotesk'] font-bold tracking-widest text-[14px] text-[#00f2ff] transition-colors uppercase" aria-label="Navigate to Dashboard">DASHBOARD</button>
+            <button className="font-['Space_Grotesk'] font-bold tracking-widest text-[14px] text-[#f6f2fc]/60 hover:text-[#00f2ff] transition-colors uppercase" aria-label="Trigger Post-Game Routing" onClick={triggerPostGame}>POST-GAME ROUTER</button>
+            <button className="font-['Space_Grotesk'] font-bold tracking-widest text-[14px] text-[#f6f2fc]/60 hover:text-[#00f2ff] transition-colors uppercase tour-step-1" aria-label={`Toggle Map Mode. Current mode: ${mode}`} onClick={() => setMode(mode === 'density' ? 'hype' : 'density')}>TOGGLE {mode.toUpperCase()}</button>
+          </nav>
           <div className="flex items-center gap-4">
-            <button onClick={() => setRunTour(true)} className="text-[#00f2ff]">
-              <HelpCircle size={24} />
+            <button onClick={() => setRunTour(true)} className="text-[#00f2ff]" aria-label="Start App Tour">
+              <HelpCircle size={24} aria-hidden="true" />
             </button>
           </div>
         </div>
       </header>
 
-      <main className="min-h-screen pt-24 pb-32 px-4 md:px-8 max-w-[1600px] mx-auto grid grid-cols-12 gap-6 relative">
+      <main className="min-h-screen pt-24 pb-32 px-4 md:px-8 max-w-[1600px] mx-auto grid grid-cols-12 gap-6 relative" role="main">
         <SeatUpgrade />
         
         {/* Left Column: HUD Widgets */}
-        <aside className="col-span-12 lg:col-span-3 flex flex-col gap-6 relative z-10 tour-step-3">
+        <aside className="col-span-12 lg:col-span-3 flex flex-col gap-6 relative z-10 tour-step-3" aria-label="Stadium Services">
           <QueueTracker />
           <LiveAnnouncer />
         </aside>
 
         {/* Center Column: Stadium Heatmap */}
-        <div className="col-span-12 lg:col-span-6 flex flex-col gap-6 relative z-10 tour-step-2">
+        <section className="col-span-12 lg:col-span-6 flex flex-col gap-6 relative z-10 tour-step-2" aria-label="Stadium Heatmap">
            <StadiumMap mode={mode} highlightZone={highlightZone} />
-        </div>
+        </section>
 
         {/* Right Column: AI Concierge */}
-        <aside id="chatbot-section" className="col-span-12 lg:col-span-3 flex flex-col gap-6 relative z-10 tour-step-4">
+        <aside id="chatbot-section" className="col-span-12 lg:col-span-3 flex flex-col gap-6 relative z-10 tour-step-4" aria-label="AI Assistant">
            <Chatbot />
         </aside>
       </main>
 
       {/* Bottom Navigation Shell */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center h-16 px-4 bg-[#25252e]/60 backdrop-blur-2xl rounded-2xl mx-auto mb-6 w-[92%] max-w-lg border border-[#48474f]/20 shadow-[0px_24px_48px_-12px_rgba(153,247,255,0.15)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center h-16 px-4 bg-[#25252e]/60 backdrop-blur-2xl rounded-2xl mx-auto mb-6 w-[92%] max-w-lg border border-[#48474f]/20 shadow-[0px_24px_48px_-12px_rgba(153,247,255,0.15)]" aria-label="Mobile Navigation">
         <button 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Scroll to Top"
           className="flex flex-col items-center justify-center gap-1 group text-[#00f2ff] drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] scale-110 h-full px-4 hover:opacity-80 transition-all">
-          <span className="material-symbols-outlined">dashboard</span>
+          <span className="material-symbols-outlined" aria-hidden="true">dashboard</span>
         </button>
         <button 
           onClick={() => setMode(mode === 'density' ? 'hype' : 'density')}
+          aria-label="Toggle Density and Hype Modes"
           className="flex flex-col items-center justify-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff] h-full px-4 transition-all">
-          <span className="material-symbols-outlined">query_stats</span>
+          <span className="material-symbols-outlined" aria-hidden="true">query_stats</span>
         </button>
         <button 
           onClick={() => {
             const chatObj = document.getElementById('chatbot-section');
             if(chatObj) chatObj.scrollIntoView({ behavior: 'smooth' });
           }}
+          aria-label="Scroll to AI Concierge"
           className="flex flex-col items-center justify-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff] h-full px-4 transition-all">
-          <span className="material-symbols-outlined">smart_toy</span>
+          <span className="material-symbols-outlined" aria-hidden="true">smart_toy</span>
         </button>
         <button 
           onClick={() => setIsTicketModalOpen(true)}
+          aria-label="Open Ticket Scanner"
           className="flex flex-col items-center justify-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff] h-full px-4 transition-all">
-          <span className="material-symbols-outlined">confirmation_number</span>
+          <span className="material-symbols-outlined" aria-hidden="true">confirmation_number</span>
         </button>
         <button 
           onClick={() => setIsProfileModalOpen(true)}
+          aria-label="Open User Profile"
           className="flex flex-col items-center justify-center gap-1 group text-[#f6f2fc]/40 hover:bg-[#f6f2fc]/5 hover:text-[#00f2ff] h-full px-4 transition-all">
-          <span className="material-symbols-outlined">account_circle</span>
+          <span className="material-symbols-outlined" aria-hidden="true">account_circle</span>
         </button>
       </nav>
 

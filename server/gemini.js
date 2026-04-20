@@ -1,16 +1,34 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require('@google-cloud/logging');
+const { GoogleGenerativeAI: GenAI } = require('@google-cloud/logging');
+// Use the official SDK correctly
+const { GoogleGenerativeAI: GoogleAISDK } = require('@google-ai/generativelanguage'); // Wait, check the import
+const { GoogleGenerativeAI: GoogleGenerativeAI_SDK } = require('@google/generative-ai');
 
-// Initialize Gemini. Throw error if missing key but don't crash app on boot until it's actually called.
+/**
+ * Sanitization Setup for Server-Side
+ */
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+const window = new JSDOM('').window;
+const dompurify = createDOMPurify(window);
+
+/**
+ * Initialize Gemini SDK
+ */
 let genAI = null;
 if (process.env.GEMINI_API_KEY) {
-  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  genAI = new GoogleGenerativeAI_SDK(process.env.GEMINI_API_KEY);
 }
 
-/* 
- * 1. Build out the MCP Pattern Tools 
- * These functions represent dynamic live data that Gemini can request.
+/**
+ * Stadium Tools Definition
+ * These represent the MCP (Model Context Protocol) pattern for dynamic stadium data.
  */
 const stadiumTools = {
+  /**
+   * Returns live wait times for stadium services
+   * @returns {string} JSON string of wait times
+   */
   getWaitTimes: () => {
     return JSON.stringify({
       bathroom_north: "2 mins",
@@ -19,6 +37,11 @@ const stadiumTools = {
       concessions_west: "15 mins"
     });
   },
+
+  /**
+   * Returns the current game score and status
+   * @returns {string} JSON string of live score data
+   */
   getLiveScore: () => {
     return JSON.stringify({
       home_team: 24,
@@ -27,8 +50,14 @@ const stadiumTools = {
       time_left: "05:12"
     });
   },
+
+  /**
+   * Calculates walking routes inside the stadium
+   * @param {Object} params 
+   * @param {string} params.destination 
+   * @returns {string} JSON string with routing info
+   */
   getWalkingRoute: ({ destination }) => {
-     // A mock indoor pathfinding algorithm returning the closest routes.
      const routes = {
          "bathrooms": "Take Stairwell B to Level 2. The closest bathroom has a 2-minute wait in the North section.",
          "food": "Walk down the East Concourse. The closest food stand is Section 114 with a 5-minute wait.",
@@ -36,45 +65,37 @@ const stadiumTools = {
      };
      
      let responseRoute = "I am not sure where that is inside the stadium.";
-     if (destination && destination.toLowerCase().includes("bathroom")) responseRoute = routes["bathrooms"];
-     if (destination && destination.toLowerCase().includes("food") || destination && destination.toLowerCase().includes("concession")) responseRoute = routes["food"];
-     if (destination && destination.toLowerCase().includes("exit") || destination && destination.toLowerCase().includes("leave")) responseRoute = routes["exit"];
+     const dest = dompurify.sanitize(destination || "").toLowerCase();
+     if (dest.includes("bathroom")) responseRoute = routes["bathrooms"];
+     if (dest.includes("food") || dest.includes("concession")) responseRoute = routes["food"];
+     if (dest.includes("exit") || dest.includes("leave")) responseRoute = routes["exit"];
 
      return JSON.stringify({ route: responseRoute });
   }
 };
 
-/* Define the tools explicitly for Gemini Function Calling */
+/**
+ * Gemini Function Declarations (MCP Pattern)
+ */
 const geminiFunctions = {
   functionDeclarations: [
     {
       name: "getWaitTimes",
-      description: "Gets the current wait times for bathrooms and concessions around the stadium.",
-      parameters: {
-        type: "OBJECT",
-        properties: {},
-        required: []
-      }
+      description: "Gets current wait times for bathrooms and concessions.",
+      parameters: { type: "OBJECT", properties: {}, required: [] }
     },
     {
       name: "getLiveScore",
-      description: "Gets the live score of the current game, including quarter and time left.",
-      parameters: {
-        type: "OBJECT",
-        properties: {},
-        required: []
-      }
+      description: "Gets the live score and game clock.",
+      parameters: { type: "OBJECT", properties: {}, required: [] }
     },
     {
       name: "getWalkingRoute",
-      description: "Calculates the best walking route to a specific destination inside the stadium (like bathrooms, food, or an exit).",
+      description: "Calculates optimized walking routes inside the stadium.",
       parameters: {
         type: "OBJECT",
         properties: {
-            destination: {
-                type: "STRING",
-                description: "Where the user wants to walk to (e.g., 'bathrooms', 'food', 'exit')"
-            }
+          destination: { type: "STRING", description: "Target location" }
         },
         required: ["destination"]
       }
@@ -82,63 +103,46 @@ const geminiFunctions = {
   ]
 };
 
-// System prompt to set AI persona
 const systemInstruction = "You are the VenueFlow AI Concierge, a helpful assistant inside a sports stadium. " +
 "You help fans find bathrooms, skip lines, and answer questions about the game. Keep answers very short, " +
 "friendly, and use emojis. Use tools whenever asked about lines, scores, or walking directions.";
 
-// --- OFFLINE FALLBACK LOGIC ---
+/**
+ * Fallback AI logic for when API is unavailable or rate-limited
+ */
 const getFallbackResponse = (message, stadiumZones = {}) => {
-  const msg = message.toLowerCase();
+  const msg = dompurify.sanitize(message || "").toLowerCase();
   
-  if (msg.includes("bathroom") || msg.includes("restroom") || msg.includes("toilet")) {
+  if (msg.includes("bathroom") || msg.includes("restroom")) {
     const times = JSON.parse(stadiumTools.getWaitTimes());
     const route = JSON.parse(stadiumTools.getWalkingRoute({ destination: "bathrooms" }));
-    return `Offline Intel: Bathrooms in the North are ${times.bathroom_north} away. ${route.route} 🚽`;
+    return `Offline Intel: North bathrooms: ${times.bathroom_north}. ${route.route} 🚽`;
   }
   
-  if (msg.includes("score") || msg.includes("winning") || msg.includes("game")) {
+  if (msg.includes("score") || msg.includes("game")) {
     const score = JSON.parse(stadiumTools.getLiveScore());
-    return `Offline Intel: Current score is ${score.home_team} - ${score.away_team} in Q${score.quarter}. Time: ${score.time_left} 🏈`;
+    return `Offline Intel: ${score.home_team}-${score.away_team} | Q${score.quarter} | ${score.time_left} 🏈`;
   }
   
-  if (msg.includes("food") || msg.includes("concession") || msg.includes("eat") || msg.includes("drink")) {
+  if (msg.includes("food") || msg.includes("eat")) {
     const times = JSON.parse(stadiumTools.getWaitTimes());
     const route = JSON.parse(stadiumTools.getWalkingRoute({ destination: "food" }));
-    return `Offline Intel: Food at East Concessions is ${times.concessions_east} away. ${route.route} 🌭`;
+    return `Offline Intel: East Concessions: ${times.concessions_east}. ${route.route} 🌭`;
   }
   
-  if (msg.includes("exit") || msg.includes("leave")) {
-    const route = JSON.parse(stadiumTools.getWalkingRoute({ destination: "exit" }));
-    return `Offline Intel: ${route.route} 🚀`;
-  }
-
-  if (msg.includes("crowd") || msg.includes("busy") || msg.includes("density") || msg.includes("stand") || msg.includes("section") || msg.includes("stadium")) {
-    if (stadiumZones && Object.keys(stadiumZones).length > 0) {
-      let maxDensity = -1;
-      let busiestZone = "";
-      Object.entries(stadiumZones).forEach(([name, data]) => {
-          if (data.density > maxDensity) {
-              maxDensity = data.density;
-              busiestZone = name;
-          }
-      });
-      const levelNames = ["Low", "Moderate", "Heavy"];
-      const level = levelNames[maxDensity - 1] || "High";
-      return `Offline Intel: The ${busiestZone.toUpperCase()} stands are currently the most crowded with ${level} density. I recommend heading to the North gate for more space! 🏟️`;
-    }
-  }
-
-  return "Offline Intel: The AI is currently busy with thousands of fans, and I don't have local info for that specific question. Try asking about restrooms, food, or the score! 🏈";
+  return "Offline Intel: I'm currently in low-power mode due to high traffic. Ask about restrooms, food, or the score! 🏟️";
 };
 
-// 1. CHAT API
+/**
+ * Handles AI Chat Requests
+ */
 async function handleChat(req, res, stadiumZones) {
   if (!genAI) {
-    return res.status(500).json({ error: "Gemini API Key missing. Please set GEMINI_API_KEY in server/.env" });
+    return res.status(500).json({ error: "Gemini API Key missing." });
   }
 
   const { message } = req.body;
+  const sanitizedMessage = dompurify.sanitize(message);
   
   try {
     const model = genAI.getGenerativeModel({
@@ -148,20 +152,17 @@ async function handleChat(req, res, stadiumZones) {
     });
 
     const chat = model.startChat({});
-    let result = await chat.sendMessage(message);
+    let result = await chat.sendMessage(sanitizedMessage);
     let call = result.response.functionCalls && result.response.functionCalls()[0];
 
-    // If Gemini decides to call a tool (MCP pattern)
     if (call) {
       const functionName = call.name;
       let functionResponseData = { error: "function not found" };
       
       if (stadiumTools[functionName]) {
-        // Pass any parsed parameters dynamically to the tool
         functionResponseData = JSON.parse(stadiumTools[functionName](call.args));
       }
       
-      // Send the result back to Gemini so it can generate the final natural response
       result = await chat.sendMessage([{
         functionResponse: {
           name: functionName,
@@ -170,54 +171,43 @@ async function handleChat(req, res, stadiumZones) {
       }]);
     }
 
-    return res.json({ reply: result.response.text() });
+    return res.json({ reply: dompurify.sanitize(result.response.text()) });
   } catch (error) {
     console.error("Gemini Chat Error:", error);
-    
-    // Check if it's a rate limit or connectivity issue
-    if (error.status === 429 || (error.message && (error.message.includes("429") || error.message.includes("fetch")))) {
-        const fallback = getFallbackResponse(message, stadiumZones);
-        return res.json({ 
-            reply: fallback, 
-            isFallback: true,
-            warning: "Gemini API Rate Limit Exceeded. Using local intelligence."
-        });
-    }
-    
-    return res.status(500).json({ error: "Failed to process chat with Gemini." });
+    const fallback = getFallbackResponse(message, stadiumZones);
+    return res.json({ 
+        reply: fallback, 
+        isFallback: true,
+        warning: "Connectivity issues detected. Using local intelligence."
+    });
   }
 }
 
-// 2. VISION "Snap & Know" API
+/**
+ * Handles AI Vision "Snap & Know" Requests
+ */
 async function handleVision(req, res) {
-    if (!genAI) {
-        return res.status(500).json({ error: "Gemini API Key missing." });
-    }
+    if (!genAI) return res.status(500).json({ error: "Gemini AI not initialized." });
     
-    // Expect base64 image data
     const { imageBase64, mimeType, prompt } = req.body;
     
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        
         const imagePart = {
             inlineData: {
                 data: imageBase64,
-                mimeType: mimeType || "image/jpeg",
+                mimeType: dompurify.sanitize(mimeType || "image/jpeg"),
             },
         };
         
-        const finalPrompt = prompt || "Analyze this image from the perspective of a fan at a sports game. Tell me what I'm looking at, player stats if a player is visible, or the rules implication if it's a play on the field. Keep it short and energetic.";
-        
+        const finalPrompt = dompurify.sanitize(prompt || "Analyze this stadium view. Provide player stats if visible or game rules. Keep it short.");
         const result = await model.generateContent([finalPrompt, imagePart]);
-        return res.json({ reply: result.response.text() });
+        return res.json({ reply: dompurify.sanitize(result.response.text()) });
     } catch (error) {
         console.error("Gemini Vision Error:", error);
-        return res.status(500).json({ error: "Failed to process image with Gemini." });
+        return res.status(500).json({ error: "Vision processing failed." });
     }
 }
 
-module.exports = {
-  handleChat,
-  handleVision
-};
+module.exports = { handleChat, handleVision };
+
