@@ -1,6 +1,15 @@
 const express = require('express');
 const path = require('path');
 const http = require('http');
+
+process.on('uncaughtException', (err) => {
+  console.error('CRITICAL ERROR (uncaughtException):', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('CRITICAL ERROR (unhandledRejection):', reason);
+});
 const { Server } = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
