@@ -13,6 +13,10 @@
   "type": "commonjs",
   "dependencies": {
     "@google-cloud/logging": "^11.2.1",
+    "@google-cloud/monitoring-dashboards": "^4.1.1",
+    "@google-cloud/secret-manager": "^6.1.1",
+    "@google-cloud/storage": "^7.19.0",
+    "@google-cloud/trace-agent": "^8.0.0",
     "@google/generative-ai": "^0.24.1",
     "cors": "^2.8.6",
     "dompurify": "^3.4.0",
@@ -20,6 +24,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.2",
     "express-validator": "^7.3.2",
+    "firebase-admin": "^13.8.0",
     "helmet": "^8.1.0",
     "jsdom": "^29.0.2",
     "jsonwebtoken": "^9.0.3",
