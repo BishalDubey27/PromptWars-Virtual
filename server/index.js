@@ -39,16 +39,17 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-// Security: Helmet & CSP
+// Security: Helmet & CSP (Optimized for GCP Services)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.socket.io", "https://maps.googleapis.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      imgSrc: ["'self'", "data:", "https://api.dicebear.com", "https://storage.googleapis.com"],
-      connectSrc: ["'self'", "wss://*.run.app", "https://*.run.app", "https://generativelanguage.googleapis.com", "*.googleapis.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.socket.io", "https://maps.googleapis.com", "https://*.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://*.googleapis.com"],
+      imgSrc: ["'self'", "data:", "https://api.dicebear.com", "https://*.googleapis.com", "https://*.gstatic.com", "https://storage.googleapis.com", "https://www.transparenttextures.com"],
+      connectSrc: ["'self'", "wss://*.run.app", "https://*.run.app", "https://generativelanguage.googleapis.com", "https://*.googleapis.com", "https://*.firebaseio.com", "ws://localhost:*", "http://localhost:*"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      frameSrc: ["'self'", "https://*.google.com"],
     },
   },
 }));
@@ -115,7 +116,15 @@ app.get('/healthz', (req, res) => res.status(200).send('OK'));
 
 // Serve Static Frontend
 app.use(express.static(path.join(__dirname, '../client/dist')));
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../client/dist/index.html')));
+
+// Catch-all route to serve index.html for SPA routing
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  } else {
+    next();
+  }
+});
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, '0.0.0.0', () => {

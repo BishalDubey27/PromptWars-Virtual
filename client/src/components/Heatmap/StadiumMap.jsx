@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Wrapper } from "@googlemaps/react-wrapper";
 import { listenToStadiumState } from '../../firebase';
 import { motion } from 'framer-motion';
+import { io } from 'socket.io-client';
 
-// Futuristic Dark Mode styling for Google Maps
 const mapStyles = [
   { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
   { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
@@ -21,21 +21,23 @@ const MapComponent = ({ zones, mode }) => {
 
   useEffect(() => {
     if (ref.current && !map) {
-      const newMap = new window.google.maps.Map(ref.current, {
-        center: { lat: 36.0909, lng: -115.1833 }, // Allegiant Stadium
-        zoom: 17,
-        styles: mapStyles,
-        disableDefaultUI: true,
-        mapTypeId: 'satellite'
-      });
-      setMap(newMap);
+      try {
+        const newMap = new window.google.maps.Map(ref.current, {
+          center: { lat: 36.0909, lng: -115.1833 },
+          zoom: 17,
+          styles: mapStyles,
+          disableDefaultUI: true,
+          mapTypeId: 'satellite'
+        });
+        setMap(newMap);
+      } catch (err) {
+        console.error("Map initialization failed:", err);
+      }
     }
   }, [ref, map]);
 
-  // Handle Zone Visual Overlays (Circles for Heatmap)
   useEffect(() => {
     if (!map || !zones) return;
-
     const zoneCoords = {
       north: { lat: 36.0915, lng: -115.1833 },
       south: { lat: 36.0903, lng: -115.1833 },
@@ -46,7 +48,6 @@ const MapComponent = ({ zones, mode }) => {
     const markers = Object.entries(zoneCoords).map(([key, pos]) => {
       const occupancy = zones[key]?.occupancy || 50;
       const color = occupancy > 90 ? '#ff0000' : occupancy > 70 ? '#ffae00' : '#00f2ff';
-      
       return new window.google.maps.Circle({
         strokeColor: color,
         strokeOpacity: 0.8,
@@ -72,14 +73,25 @@ const StadiumMap = ({ mode, highlightZone }) => {
     east: { occupancy: 92, status: 'critical' },
     west: { occupancy: 30, status: 'quiet' }
   });
+  const [useFallbackMap, setUseFallbackMap] = useState(false);
 
   useEffect(() => {
-    // Switch to Firestore Real-time listener for "Google Services" score
+    // Attempt Firestore (GCP)
     const unsubscribe = listenToStadiumState((data) => {
       if (data) setZones(data);
     });
-    return () => unsubscribe();
+    
+    // Also keep Socket.io as a local dev fallback
+    const socket = io('/');
+    socket.on('stadium-update', (data) => setZones(data));
+
+    return () => {
+      unsubscribe();
+      socket.disconnect();
+    };
   }, []);
+
+  const apiKey = ""; // Insert Map Key Here
 
   return (
     <section className="glass-panel flex-1 rounded-2xl relative overflow-hidden group h-full flex flex-col p-4">
@@ -91,13 +103,23 @@ const StadiumMap = ({ mode, highlightZone }) => {
         <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded text-[10px] font-bold text-primary uppercase">GCP Active</div>
       </div>
 
-      <div className="flex-1 relative rounded-xl overflow-hidden border border-white/5">
-        <Wrapper apiKey={""} version="beta" libraries={["places"]}>
-           <MapComponent zones={zones} mode={mode} />
-        </Wrapper>
+      <div className="flex-1 relative rounded-xl overflow-hidden border border-white/5 bg-[#0e0e14]">
+        {!apiKey ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=36.0909,-115.1833&zoom=16&size=600x400&maptype=satellite&key=')] bg-cover opacity-60">
+             <div className="glass-panel-dark p-6 rounded-2xl border border-primary/30 backdrop-blur-xl">
+                <span className="material-symbols-outlined text-primary text-4xl mb-2">map</span>
+                <h3 className="text-white font-bold mb-1 uppercase tracking-widest text-sm">Satellite Feed Standby</h3>
+                <p className="text-[10px] text-on-surface-variant max-w-[200px]">Waiting for Google Maps API Key deployment. HUD active with local simulation.</p>
+             </div>
+          </div>
+        ) : (
+          <Wrapper apiKey={apiKey} version="beta" libraries={["places"]}>
+             <MapComponent zones={zones} mode={mode} />
+          </Wrapper>
+        )}
         
         {/* Futursitic HUD Overlay */}
-        <div className="absolute top-4 left-4 p-3 glass-panel-dark rounded-lg pointer-events-none border border-primary/20">
+        <div className="absolute top-4 left-4 p-3 glass-panel-dark rounded-lg pointer-events-none border border-primary/20 z-20">
            <div className="text-[9px] text-primary font-bold uppercase mb-1">Global Occupancy</div>
            <div className="text-xl font-bold text-white tracking-widest">78%</div>
         </div>
